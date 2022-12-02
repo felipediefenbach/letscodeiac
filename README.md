@@ -2,7 +2,7 @@ Fases:
 
 Desafio 00: Criação de infraestrutura base
 
-    Sua rede será pequena, escolha um range de IP adequado e justifique-o:
+    RedeMaterna(supernet) => Classe B para maior viabilidade de expansão futura.
+    SubRedes(subrede) => Usado intervalo de 14 host pois este é o menor número hosts permitidos nas subredes da VPC da AWS.
 
-        Subrede classe B para maior viabilidade de expansão futura.
-        Range de 14 host porque é o menor número de hosts permitidos na VPC da AWS para uma Subrede
+Desafio 01: Criação do backend

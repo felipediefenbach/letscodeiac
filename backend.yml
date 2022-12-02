@@ -1,0 +1,45 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  collections:
+    - community.docker
+  vars:
+    nome: 'backend'
+    versao: 'v01'
+  tasks:
+
+  - ansible.builtin.get_url:
+      url: https://download.docker.com/linux/centos/docker-ce.repo
+      dest: /etc/yum.repos.d/docer-ce.repo
+
+  - ansible.builtin.dnf:
+      name: docker-ce
+      state: latest
+
+  - ansible.builtin.service:
+      name: docker
+      state: started
+      enabled: yes
+
+  - community.docker.docker_image:
+      name: "{{ nome }}:{{ v01 }}"
+      build:
+        path: /root/dockerfile-backend
+      source: build
+      state: present
+
+  - community.docker.docker_container:
+      name: "{{ nome }}-{{ versao }}-prod"
+      image: "{{ nome }}:{{ v01 }}"
+      state: started
+      detach: yes
+      tty: yes
+      restart_policy: always
+      ports:
+        - "0.0.0.0:8080:8080"
+        - "0.0.0.0:443:443"
+      env:
+        MYSQL_DB_HOST: "jdbc:mysql://mysqlbackend:3306"
+        MYSQL_DB_USER: "backend"
+        MYSQL_DB_PASS: "N4t5%a0&vPx2"

@@ -19,13 +19,13 @@
         - docker-ce
         - python3-pip
         - python3-setuptools
-        - python3-libselinux
         - httpd
       state: latest
 
   - ansible.builtin.pip:
         name:
           - docker
+          - selinux
 
   - ansible.builtin.service:
       name: docker

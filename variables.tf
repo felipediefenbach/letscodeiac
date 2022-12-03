@@ -24,6 +24,7 @@ variable "sshOrigensPermitidas" {}
 // RDS
 variable "mysqlBackendSenha" {}
 variable "mysqlBackendUsuario" {}
+variable "mysqlBackendDb" {}
 
 // EC2
 variable "discoRaizTipo" { default = "gp3" }

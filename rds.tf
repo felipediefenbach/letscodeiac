@@ -8,6 +8,7 @@ resource "aws_db_subnet_group" "mysqlbackend" {
 
 resource "aws_db_instance" "mysqlbackend" {
    identifier = "mysqlbackend"
+   db_name = var.mysqlBackendDb
    instance_class = "db.t3.micro"
    allocated_storage = 5
    engine = "mysql"

@@ -26,6 +26,7 @@ sshOrigensPermitidas= [
 // Bancos
 mysqlBackendSenha = "N4t5%a0&vPx2"
 mysqlBackendUsuario = "apibackend"
+mysqlBackendDb = "letscodebyada"
 
 // Maquinas
 backendTipo = "t3a.medium"

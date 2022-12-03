@@ -23,13 +23,12 @@
         - docker-ce
         - python3-pip
         - python3-setuptools
-        - python3-mysql
-        - httpd
       state: latest
 
   - ansible.builtin.pip:
       name:
         - docker
+        - pymysql
 
   - ansible.builtin.service:
       name: docker
@@ -67,7 +66,7 @@
         - "0.0.0.0:8080:8080"
         - "0.0.0.0:443:443"
       env:
-        MYSQL_DB_HOST: "jdbc:mysql://{{ mysqlBackendHost }}:3306"
+        MYSQL_DB_HOST: "jdbc:mysql://{{ mysqlBackendHost }}:3306/{{ mysqlBackendDb }}"
         MYSQL_DB_USER: "{{ mysqlBackendUsuario }}"
         MYSQL_DB_PASS: "{{ mysqlBackendSenha }}"
   
@@ -82,3 +81,4 @@
       login_user: "{{ mysqlBackendUsuario }}"
       query:
         - INSERT INTO usuario (password, username) VALUES ('letscodeiac', 'letscodeiac')
+    

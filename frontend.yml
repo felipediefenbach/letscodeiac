@@ -4,7 +4,6 @@
   gather_facts: false
   collections:
     - community.docker
-    - ansible.posix
   vars:
     nome: 'frontend'
     versao: 'v01'
@@ -25,7 +24,6 @@
   - ansible.builtin.pip:
         name:
           - docker
-          - selinux
 
   - ansible.builtin.service:
       name: docker
@@ -58,9 +56,7 @@
       ports:
         - "0.0.0.0:4200:4200"
   
-  - ansible.posix.selinux:
-      policy: targeted
-      state: permissive
+  - ansible.builtin.shell: 'setsebool -P httpd_can_network_connect=1'
 
   - ansible.builtin.copy:
       dest: '/etc/httpd/conf.d/proxy.conf'

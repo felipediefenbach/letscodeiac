@@ -94,18 +94,6 @@ resource "aws_security_group" "backend" {
 	vpc_id = aws_vpc.materna.id
 
 	ingress {
-		description = "https"
-		from_port = 443
-		to_port = 443
-		protocol = "tcp"
-		cidr_blocks = [
-			"${var.subredePublica1}",
-			"${var.subredePublica2}",
-			"${var.subredePublica3}",
-		]
- 	}
-
-	ingress {
 		description = "Java APP"
 		from_port = 8080
 		to_port = 8080

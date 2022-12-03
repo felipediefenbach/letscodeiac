@@ -1,15 +1,15 @@
 // Ambiente
 datacenterCorrente = "us-east-1"
-nomeDoAmbiente = "adaletscode"
 terraformPerfil = "conexinfra"
+nomeDoAmbiente = "adaletscode"
 distribuicao = "ami-0c07df890a618c98a"
 chaveSshPadrao = "aws-ec2-administrador"
 
 // Dns
-dominioPrivado = "adainterno"
 publicoComBr = "homolog.conexaoinfraestrutura.inf.br"
 idZonaMaternaComBr = "Z02989652E5N1GM1F7LD1"
 publicoNomeDnsFrontend = "app"
+dominioPrivado = "adainterno"
 
 // Rede
 redeMaterna = "172.29.0.0/16"

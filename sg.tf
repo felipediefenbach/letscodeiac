@@ -147,6 +147,18 @@ resource "aws_security_group" "backend" {
 		cidr_blocks = ["0.0.0.0/0"]
  	}
 
+	ingress {
+		description = "proxy"
+		from_port = 3128
+		to_port = 3128
+		protocol = "tcp"
+		cidr_blocks = [
+			"${var.subredePrivada1}",
+			"${var.subredePrivada2}",
+			"${var.subredePrivada3}",
+		]
+ 	}
+
 	egress {
 		from_port = 0
 		to_port = 0

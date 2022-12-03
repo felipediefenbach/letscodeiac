@@ -35,16 +35,6 @@
     - ansible.builtin.wait_for_connection:
       delegate_to: acesso.{{ dominio }}
 
-    - ansible.builtin.copy:
-        src: './aws-ec2-administrador.pem'
-        dest: '/root/.ssh/id_rsa'
-        owner: 'root'
-        group: 'root'
-        mode: '0600'
-      delegate_to: acesso.{{ dominio }}
-      become: true
-      tags: [ never, git ]
-
     - ansible.builtin.dnf:
         name: epel-release
       delegate_to: acesso.{{ dominio }}
@@ -67,8 +57,19 @@
       become: true
       tags: [ never, git ]
 
+    - ansible.builtin.copy:
+        src: './aws-ec2-administrador.pem'
+        dest: "{{ git_diretorio }}/aws-ec2-administrador.pem"
+        owner: 'root'
+        group: 'root'
+        mode: '0600'
+      delegate_to: acesso.{{ dominio }}
+      become: true
+      tags: [ never, git ]
+      
     - ansible.builtin.shell: |
         ansible-playbook frontend.yml
+        ansible-playbook -i -i apibackend, backend.yml
       args:
         chdir: "{{ git_diretorio }}"
         executable: /bin/bash

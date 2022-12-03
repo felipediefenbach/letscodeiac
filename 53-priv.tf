@@ -14,6 +14,14 @@ resource "aws_route53_record" "backend" {
   records = [aws_instance.backend.private_ip]
 }
 
+resource "aws_route53_record" "proxy" {
+  zone_id = aws_route53_zone.interna.zone_id
+  name    = "proxy"
+  type    = "A"
+  ttl     = "30"
+  records = [aws_instance.frontend.private_ip]
+}
+
 resource "aws_route53_record" "database" {
   zone_id = aws_route53_zone.interna.zone_id
   name    = "mysqlbackend"

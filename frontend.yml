@@ -9,6 +9,10 @@
     versao: 'v01'
   tasks:
 
+  - ansible.builtin.dnf:
+      name: epel-release
+    state: latest
+
   - ansible.builtin.get_url:
       url: https://download.docker.com/linux/centos/docker-ce.repo
       dest: /etc/yum.repos.d/docer-ce.repo
@@ -19,6 +23,7 @@
         - python3-pip
         - python3-setuptools
         - httpd
+        - squid
       state: latest
 
   - ansible.builtin.pip:
@@ -61,5 +66,15 @@
 
   - ansible.builtin.service:
       name: httpd
+      state: started
+      enabled: yes
+
+  - ansible.builtin.lineinfile:
+      path: '/etc/squid/squid.conf'
+      regexp: '^acl\ localnet\ src\ fe80\:\:\/10.*'
+      line: 'acl localnet src 0.0.0.0/0'
+
+  - ansible.builtin.service:
+      name: squid
       state: started
       enabled: yes

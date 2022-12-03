@@ -14,7 +14,9 @@
       dest: /etc/yum.repos.d/docer-ce.repo
 
   - ansible.builtin.dnf:
-      name: docker-ce
+      name: 
+        - docker-ce
+        -  python3-docker
       state: latest
 
   - ansible.builtin.service:

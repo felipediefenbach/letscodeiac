@@ -123,8 +123,38 @@ resource "aws_security_group" "backend" {
 		protocol = "-1"
 		cidr_blocks = ["0.0.0.0/0"]
 	}
+}
+
+	resource "aws_security_group" "frontend" {
+
+	name = "${var.nomeDoAmbiente}-ec2-frontend"
+	description = "Permite acesso as portas da Instancia do frontend"
+	vpc_id = aws_vpc.materna.id
+
+	ingress {
+		description = "https"
+		from_port = 443
+		to_port = 443
+		protocol = "tcp"
+		cidr_blocks = ["0.0.0.0/0"]
+ 	}
+
+	ingress {
+		description = "http"
+		from_port = 80
+		to_port = 80
+		protocol = "tcp"
+		cidr_blocks = ["0.0.0.0/0"]
+ 	}
+
+	egress {
+		from_port = 0
+		to_port = 0
+		protocol = "-1"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
 
 	tags = {
-		Name = "${var.nomeDoAmbiente}-ec2-backend"
+		Name = "${var.nomeDoAmbiente}-ec2-frontend"
 	}
 }

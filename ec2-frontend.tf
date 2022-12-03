@@ -1,12 +1,17 @@
-// EC2 Backend
-resource "aws_instance" "backend" {
+// EC2 frontend
+data "template_file" "frontend" {
+  template = file("./cloud-init/frontend.sh")
+}
+resource "aws_instance" "frontend" {
+	user_data = data.template_file.frontend.rendered
 	ami = var.distribuicao
-	instance_type = var.backendTipo
-	availability_zone = "${var.datacenterCorrente}d"
-	subnet_id = aws_subnet.subredePrivada1.id
+	instance_type = var.frontendTipo
+	availability_zone = "${var.datacenterCorrente}a"
+	subnet_id = aws_subnet.subredePublica1.id
 	vpc_security_group_ids = [
 		aws_security_group.sshInterno.id,
-		aws_security_group.backend.id,
+		aws_security_group.sshExterno.id,
+		aws_security_group.frontend.id,
 	]
 	key_name = var.chaveSshPadrao
 	
@@ -22,8 +27,9 @@ resource "aws_instance" "backend" {
 	}
 
 	tags = {
-		Name = "${var.nomeDoAmbiente}-backend"
+		Name = "${var.nomeDoAmbiente}-frontend"
 	}
 
 	depends_on = [aws_key_pair.parDeChaves]
 }
+

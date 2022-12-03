@@ -1,5 +1,7 @@
 FROM quay.io/centos/centos:stream8
 
+WORKDIR /root
+
 ENV TZ="America/Sao_Paulo"
 ENV MYSQL_DB_HOST=""
 ENV MYSQL_DB_USER=""

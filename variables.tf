@@ -7,6 +7,9 @@ variable "chaveSshPadrao" {}
 
 // R53
 variable "dominioPrivado" {}
+variable "publicoComBr" {}
+variable "idZonaMaternaComBr" {}
+variable "publicoNomeDnsFrontend" {}
 
 // VPC
 variable "redeMaterna" {}
@@ -22,10 +25,11 @@ variable "sshOrigensPermitidas" {}
 variable "mysqlBackendSenha" {}
 variable "mysqlBackendUsuario" {}
 
-// ECS
+// EC2
 variable "discoRaizTipo" { default = "gp3" }
 variable "discoRaizTamanho" { default = "10" }
 variable "discoRaizIops" { default = "3000" }
 variable "discoRaizVelocidade" { default = "128" }
 
 variable "backendTipo" {}
+variable "frontendTipo" {}

@@ -1,10 +1,11 @@
 ---
-- hosts: apibackend
+- hosts: localhost
+  connection: local
   gather_facts: false
   collections:
     - community.docker
   vars:
-    nome: 'backend'
+    nome: 'frontend'
     versao: 'v01'
   tasks:
 
@@ -24,7 +25,7 @@
   - community.docker.docker_image:
       name: "{{ nome }}:{{ versao }}"
       build:
-        path: /root/dockerfile-backend
+        path: /root/dockerfile-frontend
       source: build
       state: present
 
@@ -36,9 +37,4 @@
       tty: yes
       restart_policy: always
       ports:
-        - "0.0.0.0:8080:8080"
-        - "0.0.0.0:443:443"
-      env:
-        MYSQL_DB_HOST: "jdbc:mysql://mysqlbackend:3306"
-        MYSQL_DB_USER: "backend"
-        MYSQL_DB_PASS: "N4t5%a0&vPx2"
+        - "0.0.0.0:4200:4200"

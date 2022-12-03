@@ -26,6 +26,10 @@ resource "aws_route_table_association" "acomplamento-subredePublica3" {
 // Tabela de rotas Privada
 resource "aws_route_table" "privada" {
         vpc_id = aws_vpc.materna.id
+        route {
+                cidr_block = "0.0.0.0/0"
+                nat_gateway_id = aws_nat_gateway.natPrivada1.id
+        }
         tags = {
                 Name = "${var.nomeDoAmbiente}-privada"
         }

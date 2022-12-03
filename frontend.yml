@@ -9,13 +9,28 @@
     versao: 'v01'
   tasks:
 
+  - ansible.builtin.shell: 'setenforce 0'
+  - ansible.builtin.shell: 'modprobe br_netfilter'
+
   - ansible.builtin.get_url:
       url: https://download.docker.com/linux/centos/docker-ce.repo
       dest: /etc/yum.repos.d/docer-ce.repo
 
+  - ansible.builtin.copy:
+      path: '/etc/yum.repos.d/kubernetes.repo'
+      content: |
+        [kubernetes]
+        name=Kubernetes
+        baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+        enabled=1
+        gpgcheck=1
+        repo_gpgcheck=1
+        gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
   - ansible.builtin.dnf:
       name: 
         - docker-ce
+        - kubeadm
         - python3-pip
         - python3-setuptools
         - httpd
@@ -30,47 +45,50 @@
       state: started
       enabled: yes
 
-  - community.docker.docker_container:
-      name: "{{ nome }}-{{ versao }}-prod"
-      state: absent
-    
-  - community.docker.docker_image:
-      state: absent
-      name: "{{ nome }}"
-      tag: "{{ versao }}"
-
-  - community.docker.docker_image:
-      name: "{{ nome }}:{{ versao }}"
-      build:
-        path: 'dockerfront/'
-      source: build
-      state: present
-
-  - community.docker.docker_container:
-      name: "{{ nome }}-{{ versao }}-prod"
-      image: "{{ nome }}:{{ versao }}"
-      state: started
-      detach: yes
-      tty: yes
-      restart_policy: always
-      ports:
-        - "0.0.0.0:4200:4200"
-  
-  - ansible.builtin.shell: 'setsebool -P httpd_can_network_connect=1'
-
-  - ansible.builtin.copy:
-      dest: '/etc/httpd/conf.d/proxy.conf'
-      content: |
-        <VirtualHost *:80>
-          ErrorLog /var/log/httpd/app.err
-          CustomLog /var/log/httpd/app.log combined
-
-          ProxyPreserveHost On
-          ProxyPass / http://172.17.0.1:4200/
-          ProxyPassReverse / http://172.17.0.1:4200/
-        </VirtualHost>
-
   - ansible.builtin.service:
-      name: httpd
+      name: kublet
       state: started
       enabled: yes
+      
+  # - community.docker.docker_container:
+  #     name: "{{ nome }}-{{ versao }}-prod"
+  #     state: absent
+    
+  # - community.docker.docker_image:
+  #     state: absent
+  #     name: "{{ nome }}"
+  #     tag: "{{ versao }}"
+
+  # - community.docker.docker_image:
+  #     name: "{{ nome }}:{{ versao }}"
+  #     build:
+  #       path: 'dockerfront/'
+  #     source: build
+  #     state: present
+
+  # - community.docker.docker_container:
+  #     name: "{{ nome }}-{{ versao }}-prod"
+  #     image: "{{ nome }}:{{ versao }}"
+  #     state: started
+  #     detach: yes
+  #     tty: yes
+  #     restart_policy: always
+  #     ports:
+  #       - "0.0.0.0:4200:4200"
+
+  # - ansible.builtin.copy:
+  #     dest: '/etc/httpd/conf.d/proxy.conf'
+  #     content: |
+  #       <VirtualHost *:80>
+  #         ErrorLog /var/log/httpd/app.err
+  #         CustomLog /var/log/httpd/app.log combined
+
+  #         ProxyPreserveHost On
+  #         ProxyPass / http://172.17.0.1:4200/
+  #         ProxyPassReverse / http://172.17.0.1:4200/
+  #       </VirtualHost>
+
+  # - ansible.builtin.service:
+  #     name: httpd
+  #     state: started
+  #     enabled: yes

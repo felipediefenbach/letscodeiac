@@ -14,6 +14,8 @@
     mysqlBackendDb: 'letscodebyada'
   tasks:
 
+  - ansible.builtin.shell: 'setenforce 0'
+  
   - ansible.builtin.get_url:
       url: https://download.docker.com/linux/centos/docker-ce.repo
       dest: /etc/yum.repos.d/docer-ce.repo

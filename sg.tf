@@ -120,14 +120,6 @@ resource "aws_security_group" "backend" {
 	vpc_id = aws_vpc.materna.id
 
 	ingress {
-		description = "https"
-		from_port = 443
-		to_port = 443
-		protocol = "tcp"
-		cidr_blocks = ["0.0.0.0/0"]
- 	}
-
-	ingress {
 		description = "http"
 		from_port = 80
 		to_port = 80
@@ -136,9 +128,41 @@ resource "aws_security_group" "backend" {
  	}
 
 	ingress {
-		description = "proxy"
-		from_port = 3128
-		to_port = 3128
+		from_port = 6443
+		to_port = 6443
+		protocol = "tcp"
+		cidr_blocks = [
+			"${var.subredePrivada1}",
+			"${var.subredePrivada2}",
+			"${var.subredePrivada3}",
+		]
+ 	}
+
+	ingress {
+		from_port = 2379
+		to_port = 2380
+		protocol = "tcp"
+		cidr_blocks = [
+			"${var.subredePrivada1}",
+			"${var.subredePrivada2}",
+			"${var.subredePrivada3}",
+		]
+ 	}
+
+	ingress {
+		from_port = 10250
+		to_port = 10252
+		protocol = "tcp"
+		cidr_blocks = [
+			"${var.subredePrivada1}",
+			"${var.subredePrivada2}",
+			"${var.subredePrivada3}",
+		]
+ 	}
+
+	ingress {
+		from_port = 10255
+		to_port = 10255
 		protocol = "tcp"
 		cidr_blocks = [
 			"${var.subredePrivada1}",

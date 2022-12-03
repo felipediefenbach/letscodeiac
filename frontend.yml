@@ -10,14 +10,6 @@
     versao: 'v01'
   tasks:
 
-  - ansible.posix.selinux:
-      policy: targeted
-      state: permissive
-
-  - ansible.builtin.dnf:
-      name: epel-release
-      state: latest
-
   - ansible.builtin.get_url:
       url: https://download.docker.com/linux/centos/docker-ce.repo
       dest: /etc/yum.repos.d/docer-ce.repo
@@ -27,6 +19,7 @@
         - docker-ce
         - python3-pip
         - python3-setuptools
+        - python3-libselinux
         - httpd
       state: latest
 
@@ -56,6 +49,10 @@
       ports:
         - "0.0.0.0:4200:4200"
   
+  - ansible.posix.selinux:
+      policy: targeted
+      state: permissive
+
   - ansible.builtin.copy:
       dest: '/etc/httpd/conf.d/proxy.conf'
       content: |

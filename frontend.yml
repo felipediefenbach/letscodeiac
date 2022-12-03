@@ -16,8 +16,13 @@
   - ansible.builtin.dnf:
       name: 
         - docker-ce
-        -  python3-docker
+        - python3-pip
+        - python3-setuptools
       state: latest
+
+  - ansible.builtin.pip:
+        name:
+          - docker
 
   - ansible.builtin.service:
       name: docker

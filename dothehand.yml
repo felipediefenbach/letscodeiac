@@ -11,7 +11,7 @@
     git_repo: 'github.com/felipediefenbach/letscodeiac.git'
     git_proto: 'https'
     git_diretorio: '/srv/letscodeiac'
-    git_branch: 'release/v02.1'
+    git_branch: 'feature/kubernets'
   tasks:
 
     - community.general.terraform:
@@ -84,4 +84,4 @@
     - community.general.terraform:
         project_path: "./"
         state: absent
-      tags: [ never, terrafrom, destruir ]
+      tags: [ never, destruir ]

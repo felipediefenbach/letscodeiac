@@ -17,7 +17,7 @@
       dest: /etc/yum.repos.d/docer-ce.repo
 
   - ansible.builtin.copy:
-      path: '/etc/yum.repos.d/kubernetes.repo'
+      dest: '/etc/yum.repos.d/kubernetes.repo'
       content: |
         [kubernetes]
         name=Kubernetes
@@ -49,6 +49,10 @@
       name: kublet
       state: started
       enabled: yes
+
+  - ansible.builtin.shell: |
+      swapoff -a
+      kubeadm init > /var/tmp/kubeadm-init.log
       
   # - community.docker.docker_container:
   #     name: "{{ nome }}-{{ versao }}-prod"

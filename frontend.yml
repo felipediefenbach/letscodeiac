@@ -18,6 +18,7 @@
         - docker-ce
         - python3-pip
         - python3-setuptools
+        - httpd
       state: latest
 
   - ansible.builtin.pip:
@@ -45,3 +46,20 @@
       restart_policy: always
       ports:
         - "0.0.0.0:4200:4200"
+  
+  - ansible.builtin.copy:
+      dest: '/etc/httpd/conf.d/proxy.conf'
+      content: |
+        <VirtualHost *:80>
+          ErrorLog /var/log/httpd/app.err
+          CustomLog /var/log/httpd/app.log combined
+
+          ProxyPreserveHost On
+          ProxyPass / http://172.17.0.1:4200/
+          ProxyPassReverse / http://172.17.0.1:4200/
+        </VirtualHost>
+
+  - ansible.builtin.service:
+      name: httpd
+      state: started
+      enabled: yes

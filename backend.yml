@@ -1,6 +1,7 @@
 ---
 - hosts: apibackend
   gather_facts: false
+  become: true
   collections:
     - community.docker
   vars:
@@ -13,8 +14,16 @@
       dest: /etc/yum.repos.d/docer-ce.repo
 
   - ansible.builtin.dnf:
-      name: docker-ce
+      name: 
+        - docker-ce
+        - python3-pip
+        - python3-setuptools
+        - httpd
       state: latest
+
+  - ansible.builtin.pip:
+        name:
+          - docker
 
   - ansible.builtin.service:
       name: docker
@@ -24,7 +33,7 @@
   - community.docker.docker_image:
       name: "{{ nome }}:{{ versao }}"
       build:
-        path: /root/dockerfile-backend
+        path: 'dockerback/'
       source: build
       state: present
 

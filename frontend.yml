@@ -32,6 +32,15 @@
       state: started
       enabled: yes
 
+  - community.docker.docker_container:
+      name: "{{ nome }}-{{ versao }}-prod"
+      state: absent
+    
+  - community.docker.docker_image:
+      state: absent
+      name: "{{ nome }}"
+      tag: "{{ versao }}"
+
   - community.docker.docker_image:
       name: "{{ nome }}:{{ versao }}"
       build:

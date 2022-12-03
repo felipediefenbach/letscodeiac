@@ -19,4 +19,4 @@ RUN git clone https://github.com/letscodebyada/desafio-devops.git /root/desafio-
 WORKDIR /root/desafio-devops/frontend/app/src
 RUN ng analytics off
 
-CMD ["ng","serve"]
+CMD ["java","-jar","backend.jar"]

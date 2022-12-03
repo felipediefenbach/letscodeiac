@@ -11,12 +11,13 @@
     git_repo: 'github.com/felipediefenbach/letscodeiac.git'
     git_proto: 'https'
     git_diretorio: '/srv/letscodeiac'
+    git_branch: 'feature/desafio02'
   tasks:
 
     - community.general.terraform:
         project_path: "./"
         state: present
-      tags: [ never, criar ]
+      tags: [ never, terraform, criar ]
 
     - ansible.builtin.file:
         dest: './aws-ec2-administrador.pem'
@@ -30,7 +31,7 @@
         owner: root
         group: 'root'
         mode: '0600'
-      tags: [ never, git ]
+      tags: [ never, git, criar ]
 
     - ansible.builtin.wait_for_connection:
       delegate_to: acesso.{{ dominio }}
@@ -39,7 +40,7 @@
         name: epel-release
       delegate_to: acesso.{{ dominio }}
       become: true
-      tags: [ never, git ]
+      tags: [ never, git, criar ]
 
     - ansible.builtin.dnf:
         name:
@@ -48,14 +49,17 @@
         update_cache: true
       delegate_to: acesso.{{ dominio }}
       become: true
-      tags: [ never, git ]
+      tags: [ never, git, criar ]
 
     - ansible.builtin.git:
         repo: "{{ git_proto }}://{{ git_repo }}"
         dest: "{{ git_diretorio }}"
+        version: "{{ git_branch }}"
+        update: true
+        force: true
       delegate_to: acesso.{{ dominio }}
       become: true
-      tags: [ never, git ]
+      tags: [ never, git, criar ]
 
     - ansible.builtin.copy:
         src: './aws-ec2-administrador.pem'
@@ -65,19 +69,19 @@
         mode: '0600'
       delegate_to: acesso.{{ dominio }}
       become: true
-      tags: [ never, git ]
+      tags: [ never, git, criar ]
       
     - ansible.builtin.shell: |
         ansible-playbook frontend.yml
-        ansible-playbook -i -i apibackend, backend.yml
+        ansible-playbook -i apibackend, backend.yml
       args:
         chdir: "{{ git_diretorio }}"
         executable: /bin/bash
       delegate_to: acesso.{{ dominio }}
       become: true
-      tags: [ never, homolog ]
+      tags: [ never, homolog, criar ]
 
     - community.general.terraform:
         project_path: "./"
         state: absent
-      tags: [ never, destruir ]
+      tags: [ never, terrafrom, destruir ]

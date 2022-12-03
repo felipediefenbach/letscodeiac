@@ -4,14 +4,19 @@
   gather_facts: false
   collections:
     - community.docker
+    - ansible.posix
   vars:
     nome: 'frontend'
     versao: 'v01'
   tasks:
 
+  - ansible.posix.selinux:
+      policy: targeted
+      state: permissive
+
   - ansible.builtin.dnf:
       name: epel-release
-    state: latest
+      state: latest
 
   - ansible.builtin.get_url:
       url: https://download.docker.com/linux/centos/docker-ce.repo

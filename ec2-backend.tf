@@ -1,5 +1,9 @@
 // EC2 Backend
+data "template_file" "backend" {
+  template = file("./cloud-init/backend.sh")
+}
 resource "aws_instance" "backend" {
+	user_data = data.template_file.backend.rendered
 	ami = var.distribuicao
 	instance_type = var.backendTipo
 	availability_zone = "${var.datacenterCorrente}d"

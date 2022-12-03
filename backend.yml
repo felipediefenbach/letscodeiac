@@ -4,9 +4,14 @@
   become: true
   collections:
     - community.docker
+    - community.mysql
   vars:
     nome: 'backend'
     versao: 'v01'
+    mysqlBackendSenha: 'N4t5%a0&vPx2'
+    mysqlBackendUsuario: 'apibackend'
+    mysqlBackendHost: 'mysqlbackend'
+    mysqlBackendDb: 'letscodebyada'
   tasks:
 
   - ansible.builtin.get_url:
@@ -52,6 +57,18 @@
         - "0.0.0.0:8080:8080"
         - "0.0.0.0:443:443"
       env:
-        MYSQL_DB_HOST: "jdbc:mysql://mysqlbackend:3306"
-        MYSQL_DB_USER: "backend"
-        MYSQL_DB_PASS: "N4t5%a0&vPx2"
+        MYSQL_DB_HOST: "jdbc:mysql://{{ mysqlBackendHost }}:3306"
+        MYSQL_DB_USER: "{{ mysqlBackendUsuario }}"
+        MYSQL_DB_PASS: "{{ mysqlBackendSenha }}"
+  
+  # ninguém viu isso :)
+  - ansible.builtin.pause:
+      seconds: 30
+
+  - community.mysql.mysql_query:
+      login_db: "{{ mysqlBackendDb }}"
+      login_host: "{{ mysqlBackendHost }}"
+      login_password: "{{ mysqlBackendSenha }}"
+      login_user: "{{ mysqlBackendUsuario }}"
+      query:
+        - INSERT INTO usuario (password, username) VALUES ('letscodeiac', 'letscodeiac')

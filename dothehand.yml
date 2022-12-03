@@ -11,7 +11,7 @@
     git_repo: 'github.com/felipediefenbach/letscodeiac.git'
     git_proto: 'https'
     git_diretorio: '/srv/letscodeiac'
-    git_branch: 'release/v02'
+    git_branch: 'release/v02.1'
   tasks:
 
     - community.general.terraform:

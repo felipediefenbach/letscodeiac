@@ -51,6 +51,18 @@
       state: started
       enabled: yes
 
+  - ansible.builtin.copy:
+      dest: '/etc/docker/daemon.json'
+      owner: root
+      group: root
+      mode: '0644'
+      content: |
+        { "insecure-registries":["registry.adainterno:5000"] }
+
+  - ansible.builtin.service:
+      name: docker
+      state: restarted
+
   - ansible.builtin.service:
       name: kubelet
       state: started

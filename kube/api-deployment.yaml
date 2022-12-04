@@ -2,24 +2,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend
+  name: api
 spec:
   selector:
     matchLabels:
       app: hello
-      tier: backend
+      tier: api
       track: stable
   replicas: 1
   template:
     metadata:
       labels:
         app: hello
-        tier: backend
+        tier: api
         track: stable
     spec:
       containers:
         - name: hello
-          image: registry.adainterno:5000/letscodeiac/frontend:v1
+          image: registry.adainterno:5000/letscodeiac/backend:v1
           ports:
             - name: node
               containerPort: 4200

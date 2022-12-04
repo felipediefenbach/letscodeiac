@@ -6,8 +6,8 @@ metadata:
 spec:
   selector:
     app: hello
-    tier: backend
+    tier: api
   ports:
   - protocol: TCP
-    port: 4200
+    port: 8080
     targetPort: http

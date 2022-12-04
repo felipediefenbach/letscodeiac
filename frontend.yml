@@ -36,6 +36,7 @@
         - python3-pip
         - python3-setuptools
         - httpd
+        - mod_ssl
         - bind-utils
         - iproute-tc
         - iproute
@@ -49,18 +50,6 @@
       name: docker
       state: started
       enabled: yes
-
-  - ansible.builtin.copy:
-      dest: '/etc/docker/daemon.json'
-      owner: root
-      group: root
-      mode: '0644'
-      content: |
-        { "insecure-registries":["registry.adainterno:5000"] }
-
-  - ansible.builtin.service:
-      name: docker
-      state: restarted
     
   - ansible.builtin.service:
       name: kubelet
@@ -106,3 +95,21 @@
       tag: "{{ backendVersao }}"
       push: true
       source: build
+
+  - ansible.builtin.shell: 'setsebool -P httpd_can_network_connect=1'
+
+  - ansible.builtin.copy:
+      dest: '/etc/httpd/conf.d/proxy.conf'
+      content: |
+        <VirtualHost *:443>
+          ErrorLog /var/log/httpd/app.err
+          CustomLog /var/log/httpd/app.log combined
+          ProxyPreserveHost On
+          ProxyPass / http://172.17.0.1:5000/
+          ProxyPassReverse / http://172.17.0.1:5000/
+        </VirtualHost>
+
+  - ansible.builtin.service:
+      name: httpd
+      state: started
+      enabled: yes

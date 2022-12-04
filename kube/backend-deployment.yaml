@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: hello
-          image: registry.adainterno:5000/letscodeiac/frontend:v01
+          image: registry.adainterno/letscodeiac/frontend:v01
           ports:
             - name: node
               containerPort: 4200

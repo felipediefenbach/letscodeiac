@@ -7,13 +7,13 @@
     # - Projeto
     dominio: 'homolog.conexaoinfraestrutura.inf.br'
     ssh_chave: "aws-ec2-administrador.pem"
+    awscli_perfil: 'conexinfra'
     # - Git
     git_repo: 'github.com/felipediefenbach/letscodeiac.git'
     git_proto: 'https'
     git_diretorio: '/srv/letscodeiac'
     git_branch: 'feature/kubernets'
-    # - Registro
-    registro: '864342323788.dkr.ecr.us-east-1.amazonaws.com'
+    # - Registro/Imagens
     frontendNone: 'frontend'
     frontendVersao: 'latest'
     backendNone: 'backend'
@@ -77,14 +77,25 @@
       become: true
       tags: [ never, git, criar ]
 
+    # login no registro
     - ansible.builtin.shell: |
-        aws --profile conexinfra ecr get-login-password --region us-east-1 > /tmp/registry-login
-      tags: [ never, registro ]
+        aws --profile {{ awscli_perfil }} ecr get-login-password --region us-east-1 > /var/tmp/registro-login
+      tags: [ never, registro, criar ]
 
     - ansible.builtin.shell: |
-        cat /tmp/registry-login | docker login --username AWS --password-stdin {{ registro }}
-      tags: [ never, registro ]
+        terraform output urlRepoFrontend | tr -d '"' | cut -d '/' -f 1
+      register: pega_repo_frontend
+      tags: [ never, registro, criar ]
 
+    - ansible.builtin.set_fact:
+        registro: "{{ pega_repo_frontend.stdout }}"
+      tags: [ never, registro, criar ]
+
+    - ansible.builtin.shell: |
+        cat /var/tmp/registro-login | docker login --username AWS --password-stdin {{ registro }}
+      tags: [ never, registro, criar ]
+
+    # push frontend
     - community.docker.docker_image:
         build:
           path: 'dockerfront/'
@@ -92,8 +103,9 @@
         tag: "{{ frontendVersao }}"
         push: true
         source: build
-      tags: [ never, registro ]
+      tags: [ never, registro, criar ]
 
+    # push do backend
     - community.docker.docker_image:
         build:
           path: 'dockerback/'
@@ -101,17 +113,17 @@
         tag: "{{ backendVersao }}"
         push: true
         source: build
-      tags: [ never, registro ]
+      tags: [ never, registro, criar ]
 
     - ansible.builtin.copy:
-        src: '/tmp/registry-login'
-        dest: "/tmp/registry-login"
+        src: '/var/tmp/registro-login'
+        dest: "/var/tmp/registro-login"
         owner: 'root'
         group: 'root'
         mode: '0600'
       delegate_to: acesso.{{ dominio }}
       become: true
-      tags: [ never, registro ]
+      tags: [ never, registro, criar ]
 
     - ansible.builtin.shell: |
         ansible-playbook frontend.yml

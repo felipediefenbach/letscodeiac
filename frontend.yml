@@ -62,3 +62,7 @@
       export kubever=$(kubectl version | base64 | tr -d '\n')
       kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
       kubeadm token create --print-join-command > /var/tmp/kubeadm-init
+      cat /var/tmp/registro-login | docker login --username AWS --password-stdin $(cat /var/tmp/registro-login)
+      kubectl create secret generic regcred \
+        --from-file=.dockerconfigjson=${HOME}/.docker/config.json \
+        --type=kubernetes.io/dockerconfigjson

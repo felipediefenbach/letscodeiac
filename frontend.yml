@@ -5,8 +5,10 @@
   collections:
     - community.docker
   vars:
-    nome: 'frontend'
-    versao: 'v01'
+    frontendNone: 'frontend'
+    frontendVersao: 'v01'
+    backendNone: 'backend'
+    backendVersao: 'v01'
   tasks:
 
   - ansible.builtin.shell: 'setenforce 0'
@@ -66,46 +68,44 @@
       export kubever=$(kubectl version | base64 | tr -d '\n')
       kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
       kubeadm token create --print-join-command > /var/tmp/kubeadm-init
+  
+  - community.docker.docker_image:
+      state: absent
+      name: "{{ frontendNone }}"
+      tag: "{{ frontendVersao }}"
 
-  # - community.docker.docker_container:
-  #     name: "{{ nome }}-{{ versao }}-prod"
-  #     state: absent
-    
-  # - community.docker.docker_image:
-  #     state: absent
-  #     name: "{{ nome }}"
-  #     tag: "{{ versao }}"
+  - community.docker.docker_image:
+      name: "{{ frontendNone }}:{{ frontendVersao }}"
+      build:
+        path: 'dockerfront/'
+      source: build
+      state: present
 
-  # - community.docker.docker_image:
-  #     name: "{{ nome }}:{{ versao }}"
-  #     build:
-  #       path: 'dockerfront/'
-  #     source: build
-  #     state: present
+  - community.docker.docker_image:
+      state: absent
+      name: "{{ backendNone }}"
+      tag: "{{ backendVersao }}"
 
-  # - community.docker.docker_container:
-  #     name: "{{ nome }}-{{ versao }}-prod"
-  #     image: "{{ nome }}:{{ versao }}"
-  #     state: started
-  #     detach: yes
-  #     tty: yes
-  #     restart_policy: always
-  #     ports:
-  #       - "0.0.0.0:4200:4200"
+  - community.docker.docker_image:
+      name: "{{ backendNone }}:{{ backendVersao }}"
+      build:
+        path: 'dockerback/'
+      source: build
+      state: present
 
-  # - ansible.builtin.copy:
-  #     dest: '/etc/httpd/conf.d/proxy.conf'
-  #     content: |
-  #       <VirtualHost *:80>
-  #         ErrorLog /var/log/httpd/app.err
-  #         CustomLog /var/log/httpd/app.log combined
+  - ansible.builtin.copy:
+      dest: '/etc/httpd/conf.d/proxy.conf'
+      content: |
+        <VirtualHost *:80>
+          ErrorLog /var/log/httpd/app.err
+          CustomLog /var/log/httpd/app.log combined
 
-  #         ProxyPreserveHost On
-  #         ProxyPass / http://172.17.0.1:4200/
-  #         ProxyPassReverse / http://172.17.0.1:4200/
-  #       </VirtualHost>
+          ProxyPreserveHost On
+          ProxyPass / http://172.17.0.1:4200/
+          ProxyPassReverse / http://172.17.0.1:4200/
+        </VirtualHost>
 
-  # - ansible.builtin.service:
-  #     name: httpd
-  #     state: started
-  #     enabled: yes
+  - ansible.builtin.service:
+      name: httpd
+      state: started
+      enabled: yes

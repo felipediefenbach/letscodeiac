@@ -6,12 +6,10 @@
     - community.docker
     - community.mysql
   vars:
-    nome: 'backend'
-    versao: 'v01'
-    mysqlBackendSenha: 'N4t5%a0&vPx2'
-    mysqlBackendUsuario: 'apibackend'
-    mysqlBackendHost: 'mysqlbackend'
-    mysqlBackendDb: 'letscodebyada'
+    frontendNone: 'frontend'
+    frontendVersao: 'v01'
+    backendNone: 'backend'
+    backendVersao: 'v01'
   tasks:
 
   - ansible.builtin.shell: 'setenforce 0'
@@ -46,6 +44,7 @@
   - ansible.builtin.pip:
         name:
           - docker
+          - pymysql
 
   - ansible.builtin.service:
       name: docker
@@ -72,41 +71,38 @@
       systemctl restart containerd
       bash /var/tmp/kubeadm-join
       
-  # - ansible.builtin.copy:
-  #     src: 'dockerback'
-  #     dest: '/root/'
-    
-  # - community.docker.docker_container:
-  #     name: "{{ nome }}-{{ versao }}-prod"
-  #     state: absent
-    
-  # - community.docker.docker_image:
-  #     state: absent
-  #     name: "{{ nome }}"
-  #     tag: "{{ versao }}"
+  - ansible.builtin.copy:
+      src: 'dockerfront'
+      dest: '/root/'
 
-  # - community.docker.docker_image:
-  #     name: "{{ nome }}:{{ versao }}"
-  #     build:
-  #       path: '/root/dockerback'
-  #     source: build
-  #     state: present
+  - ansible.builtin.copy:
+      src: 'dockerback'
+      dest: '/root/'
+    
+  - community.docker.docker_image:
+      state: absent
+      name: "{{ frontendNone }}"
+      tag: "{{ frontendVersao }}"
 
-  # - community.docker.docker_container:
-  #     name: "{{ nome }}-{{ versao }}-prod"
-  #     image: "{{ nome }}:{{ versao }}"
-  #     state: started
-  #     detach: yes
-  #     tty: yes
-  #     restart_policy: always
-  #     ports:
-  #       - "0.0.0.0:8080:8080"
-  #       - "0.0.0.0:443:443"
-  #     env:
-  #       MYSQL_DB_HOST: "jdbc:mysql://{{ mysqlBackendHost }}:3306/{{ mysqlBackendDb }}"
-  #       MYSQL_DB_USER: "{{ mysqlBackendUsuario }}"
-  #       MYSQL_DB_PASS: "{{ mysqlBackendSenha }}"
-  
+  - community.docker.docker_image:
+      name: "{{ frontendNone }}:{{ frontendVersao }}"
+      build:
+        path: '/root/dockerfront'
+      source: build
+      state: present
+
+  - community.docker.docker_image:
+      state: absent
+      name: "{{ backendNone }}"
+      tag: "{{ backendVersao }}"
+
+  - community.docker.docker_image:
+      name: "{{ backendNone }}:{{ backendVersao }}"
+      build:
+        path: '/root/dockerback'
+      source: build
+      state: present
+
   # # ninguém viu isso :)
   # - ansible.builtin.pause:
   #     seconds: 30

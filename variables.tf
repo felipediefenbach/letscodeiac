@@ -28,7 +28,7 @@ variable "mysqlBackendDb" {}
 
 // EC2
 variable "discoRaizTipo" { default = "gp3" }
-variable "discoRaizTamanho" { default = "10" }
+variable "discoRaizTamanho" { default = "20" }
 variable "discoRaizIops" { default = "3000" }
 variable "discoRaizVelocidade" { default = "128" }
 

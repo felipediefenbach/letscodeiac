@@ -80,21 +80,21 @@
       ports:
         - "0.0.0.0:5000:5000"
 
-  - community.docker.docker_image:
-      build:
-        path: 'dockerfront/'
-      name: "registry.adainterno:5000/letscodeiac/{{ frontendNone }}"
-      tag: "{{ frontendVersao }}"
-      push: true
-      source: build
+  # - community.docker.docker_image:
+  #     build:
+  #       path: 'dockerfront/'
+  #     name: "registry.adainterno/letscodeiac/{{ frontendNone }}"
+  #     tag: "{{ frontendVersao }}"
+  #     push: true
+  #     source: build
 
-  - community.docker.docker_image:
-      build:
-        path: 'dockerback/'
-      name: "registry.adainterno:5000/letscodeiac/{{ backendNone }}"
-      tag: "{{ backendVersao }}"
-      push: true
-      source: build
+  # - community.docker.docker_image:
+  #     build:
+  #       path: 'dockerback/'
+  #     name: "registry.adainterno/letscodeiac/{{ backendNone }}"
+  #     tag: "{{ backendVersao }}"
+  #     push: true
+  #     source: build
 
   - ansible.builtin.shell: 'setsebool -P httpd_can_network_connect=1'
 

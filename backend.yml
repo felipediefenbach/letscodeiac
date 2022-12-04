@@ -6,8 +6,7 @@
     - community.docker
   tasks:
 
-  - ansible.builtin.shell: 'setenforce 0'
-  - ansible.builtin.shell: 'modprobe br_netfilter'
+  - ansible.builtin.shell: 'modprobe br_netfilter && depmod -a'
 
   - ansible.builtin.get_url:
       url: https://download.docker.com/linux/centos/docker-ce.repo
@@ -62,6 +61,13 @@
       owner: root
       group: root
       mode: '0600'
+  
+  - ansible.builtin.copy:
+      src: '/var/tmp/registro-uri'
+      dest: '/var/tmp/registro-uri'
+      owner: root
+      group: root
+      mode: '0600'
 
   - ansible.builtin.shell: |
       swapoff -a
@@ -70,7 +76,7 @@
       rm /etc/containerd/config.toml
       systemctl restart containerd
       bash /var/tmp/kubeadm-join
-      cat /tmp/registry-login | docker login --username AWS --password-stdin $(cat /var/tmp/registro-login)
+      cat /tmp/registry-login | docker login --username AWS --password-stdin $(cat /var/tmp/registro-uri)
       kubectl create secret generic regcred \
         --from-file=.dockerconfigjson=${HOME}/.docker/config.json \
         --type=kubernetes.io/dockerconfigjson

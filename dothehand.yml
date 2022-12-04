@@ -2,8 +2,8 @@
 - hosts: localhost
   gather_facts: false
   collections:
-    community.general
-    amazon.aws
+    - community.general
+    - amazon.aws
   vars:
     # - Projeto
     dominio: 'homolog.conexaoinfraestrutura.inf.br'
@@ -20,6 +20,29 @@
     backendNone: 'backend'
     backendVersao: 'latest'
   tasks:
+
+    - ansible.builtin.dnf:
+        name: epel-release
+      tags: [ never, criar ]
+
+    - ansible.builtin.get_url:
+        url: 'https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo'
+        dest: '/etc/yum.repos.d/hashicorp.repo'
+      tags: [ never, terraform, criar ]
+
+    - ansible.builtin.dnf:
+        name:
+          - terraform
+          - awscli
+          - python3-pip
+          - python3-setuptools
+      tags: [ never, terraform, criar ]
+
+    - ansible.builtin.pip:
+        name:
+          - boto3
+          - botocore
+      tags: [ never, terraform, criar ]
 
     - community.general.terraform:
         project_path: "./"
@@ -42,12 +65,6 @@
 
     - ansible.builtin.wait_for_connection:
       delegate_to: acesso.{{ dominio }}
-
-    - ansible.builtin.dnf:
-        name: epel-release
-      delegate_to: acesso.{{ dominio }}
-      become: true
-      tags: [ never, git, criar ]
 
     - ansible.builtin.dnf:
         name:
@@ -91,9 +108,11 @@
 
     - amazon.aws.ec2_instance:
         state: restarted
+        aws_profile: "{{ awscli_perfil }}"
         instance_ids:
           - "{{ pega_ec2id_backend.stdout }}"
           - "{{ pega_ec2id_frontend.stdout }}"
+      tags: [ never, terraform, criar ]
 
     # login no registro
     - ansible.builtin.shell: |
@@ -101,7 +120,7 @@
       tags: [ never, registro, criar ]
 
     - ansible.builtin.shell: |
-        terraform output urlRepoFrontend | tr -d '"' | cut -d '/' -f 1
+        terraform output urlRepoFrontend | tr -d '"' | cut -d '/' -f 1 | tee /var/tmp/registro-uri
       register: pega_repo_frontend
       tags: [ never, registro, criar ]
 
@@ -136,6 +155,16 @@
     - ansible.builtin.copy:
         src: '/var/tmp/registro-login'
         dest: "/var/tmp/registro-login"
+        owner: 'root'
+        group: 'root'
+        mode: '0600'
+      delegate_to: acesso.{{ dominio }}
+      become: true
+      tags: [ never, registro, criar ]
+
+    - ansible.builtin.copy:
+        src: '/var/tmp/registro-uri'
+        dest: "/var/tmp/registro-uri"
         owner: 'root'
         group: 'root'
         mode: '0600'

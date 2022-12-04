@@ -49,7 +49,7 @@
       enabled: yes
 
   - ansible.builtin.copy:
-      src: '/var/tmp/kubeadm-init'
+      src: '/var/tmp/kubeadm-join'
       dest: '/var/tmp/kubeadm-join'
       owner: root
       group: root
@@ -76,8 +76,5 @@
       rm /etc/containerd/config.toml
       systemctl restart containerd
       bash /var/tmp/kubeadm-join
-      cat /tmp/registry-login | docker login --username AWS --password-stdin $(cat /var/tmp/registro-uri)
-      kubectl create secret generic regcred \
-        --from-file=.dockerconfigjson=${HOME}/.docker/config.json \
-        --type=kubernetes.io/dockerconfigjson
+      cat /var/tmp/registro-login | docker login --username AWS --password-stdin $(cat /var/tmp/registro-uri)
         

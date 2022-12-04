@@ -22,6 +22,14 @@ resource "aws_route53_record" "frontend" {
   records = [aws_instance.frontend.private_ip]
 }
 
+resource "aws_route53_record" "registry" {
+  zone_id = aws_route53_zone.interna.zone_id
+  name    = "registry"
+  type    = "A"
+  ttl     = "30"
+  records = [aws_instance.frontend.private_ip]
+}
+
 resource "aws_route53_record" "database" {
   zone_id = aws_route53_zone.interna.zone_id
   name    = "mysqlbackend"

@@ -69,43 +69,28 @@
       kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
       kubeadm token create --print-join-command > /var/tmp/kubeadm-init
   
-  - community.docker.docker_image:
-      state: absent
-      name: "{{ frontendNone }}"
-      tag: "{{ frontendVersao }}"
+  - community.docker.docker_container:
+      name: registry
+      image: registry:2.7
+      state: started
+      detach: yes
+      tty: yes
+      restart_policy: always
+      ports:
+        - "0.0.0.0:5000:5000"
 
   - community.docker.docker_image:
-      name: "{{ frontendNone }}:{{ frontendVersao }}"
       build:
         path: 'dockerfront/'
+      name: "registry.adainterno:5000/letscodeiac/{{ frontendNone }}"
+      tag: "{{ frontendVersao }}"
+      push: true
       source: build
-      state: present
 
   - community.docker.docker_image:
-      state: absent
-      name: "{{ backendNone }}"
-      tag: "{{ backendVersao }}"
-
-  - community.docker.docker_image:
-      name: "{{ backendNone }}:{{ backendVersao }}"
       build:
-        path: 'dockerback/'
+        path: 'backfront/'
+      name: "registry.adainterno:5000/letscodeiac/{{ backendNone }}"
+      tag: "{{ backendVersao }}"
+      push: true
       source: build
-      state: present
-
-  - ansible.builtin.copy:
-      dest: '/etc/httpd/conf.d/proxy.conf'
-      content: |
-        <VirtualHost *:80>
-          ErrorLog /var/log/httpd/app.err
-          CustomLog /var/log/httpd/app.log combined
-
-          ProxyPreserveHost On
-          ProxyPass / http://172.17.0.1:4200/
-          ProxyPassReverse / http://172.17.0.1:4200/
-        </VirtualHost>
-
-  - ansible.builtin.service:
-      name: httpd
-      state: started
-      enabled: yes

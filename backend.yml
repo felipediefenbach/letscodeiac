@@ -4,12 +4,6 @@
   become: true
   collections:
     - community.docker
-    - community.mysql
-  vars:
-    frontendNone: 'frontend'
-    frontendVersao: 'v01'
-    backendNone: 'backend'
-    backendVersao: 'v01'
   tasks:
 
   - ansible.builtin.shell: 'setenforce 0'
@@ -44,7 +38,6 @@
   - ansible.builtin.pip:
         name:
           - docker
-          - pymysql
 
   - ansible.builtin.service:
       name: docker

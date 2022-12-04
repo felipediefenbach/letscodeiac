@@ -4,12 +4,6 @@
   gather_facts: false
   collections:
     - community.docker
-  vars:
-    registro: '864342323788.dkr.ecr.us-east-1.amazonaws.com'
-    frontendNone: 'frontend'
-    frontendVersao: 'latest'
-    backendNone: 'backend'
-    backendVersao: 'latest'
   tasks:
 
   - ansible.builtin.shell: 'setenforce 0'
@@ -68,22 +62,3 @@
       export kubever=$(kubectl version | base64 | tr -d '\n')
       kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
       kubeadm token create --print-join-command > /var/tmp/kubeadm-init
-  
-  - ansible.builtin.shell: |
-      cat /tmp/registry-login | docker login --username AWS --password-stdin {{ registro }}
-      
-  - community.docker.docker_image:
-      build:
-        path: 'dockerfront/'
-      name: "{{ registro }}/{{ frontendNone }}"
-      tag: "{{ frontendVersao }}"
-      push: true
-      source: build
-
-  - community.docker.docker_image:
-      build:
-        path: 'dockerback/'
-      name: "{{ registro }}/{{ backendNone }}"
-      tag: "{{ backendVersao }}"
-      push: true
-      source: build

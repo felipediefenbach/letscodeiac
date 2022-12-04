@@ -79,8 +79,30 @@
 
     - ansible.builtin.shell: |
         aws --profile conexinfra ecr get-login-password --region us-east-1 > /tmp/registry-login
-      tags: [ never, git, criar ]
-      
+      tags: [ never, registro ]
+
+    - ansible.builtin.shell: |
+        cat /tmp/registry-login | docker login --username AWS --password-stdin {{ registro }}
+      tags: [ never, registro ]
+
+    - community.docker.docker_image:
+        build:
+          path: 'dockerfront/'
+        name: "{{ registro }}/{{ frontendNone }}"
+        tag: "{{ frontendVersao }}"
+        push: true
+        source: build
+      tags: [ never, registro ]
+
+    - community.docker.docker_image:
+        build:
+          path: 'dockerback/'
+        name: "{{ registro }}/{{ backendNone }}"
+        tag: "{{ backendVersao }}"
+        push: true
+        source: build
+      tags: [ never, registro ]
+
     - ansible.builtin.copy:
         src: '/tmp/registry-login'
         dest: "/tmp/registry-login"
@@ -89,7 +111,7 @@
         mode: '0600'
       delegate_to: acesso.{{ dominio }}
       become: true
-      tags: [ never, git, criar ]
+      tags: [ never, registro ]
 
     - ansible.builtin.shell: |
         ansible-playbook frontend.yml

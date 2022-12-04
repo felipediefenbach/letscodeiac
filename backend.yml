@@ -68,6 +68,8 @@
       swapoff -a
       echo "$(dig +short apifrontend.adainterno) master-node" >> /etc/hosts
       echo  "$(hostname -I | cut -d ' ' -f 1) node-1 worker-node-1" >> /etc/hosts
+      rm /etc/containerd/config.toml
+      systemctl restart containerd
       bash /var/tmp/kubeadm-join
       
   # - ansible.builtin.copy:

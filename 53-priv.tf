@@ -14,9 +14,9 @@ resource "aws_route53_record" "backend" {
   records = [aws_instance.backend.private_ip]
 }
 
-resource "aws_route53_record" "proxy" {
+resource "aws_route53_record" "frontend" {
   zone_id = aws_route53_zone.interna.zone_id
-  name    = "proxy"
+  name    = "apifrontend"
   type    = "A"
   ttl     = "30"
   records = [aws_instance.frontend.private_ip]

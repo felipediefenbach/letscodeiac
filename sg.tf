@@ -105,6 +105,50 @@ resource "aws_security_group" "backend" {
 		]
  	}
 
+	ingress {
+		from_port = 6783
+		to_port = 6783
+		protocol = "tcp"
+		cidr_blocks = [
+			"${var.subredePublica1}",
+			"${var.subredePublica2}",
+			"${var.subredePublica3}",
+		]
+ 	}
+
+	ingress {
+		from_port = 10250
+		to_port = 10250
+		protocol = "tcp"
+		cidr_blocks = [
+			"${var.subredePublica1}",
+			"${var.subredePublica2}",
+			"${var.subredePublica3}",
+		]
+ 	}
+
+	ingress {
+		from_port = 10255
+		to_port = 10255
+		protocol = "tcp"
+		cidr_blocks = [
+			"${var.subredePublica1}",
+			"${var.subredePublica2}",
+			"${var.subredePublica3}",
+		]
+ 	}
+
+	ingress {
+		from_port = 30000
+		to_port = 32767
+		protocol = "tcp"
+		cidr_blocks = [
+			"${var.subredePublica1}",
+			"${var.subredePublica2}",
+			"${var.subredePublica3}",
+		]
+ 	}
+
 	egress {
 		from_port = 0
 		to_port = 0

@@ -14,73 +14,108 @@
     mysqlBackendDb: 'letscodebyada'
   tasks:
 
-  - ansible.builtin.shell: 'setenforce 0'
-  
+   - ansible.builtin.shell: 'setenforce 0'
+  - ansible.builtin.shell: 'modprobe br_netfilter'
+
   - ansible.builtin.get_url:
       url: https://download.docker.com/linux/centos/docker-ce.repo
       dest: /etc/yum.repos.d/docer-ce.repo
 
+  - ansible.builtin.copy:
+      dest: '/etc/yum.repos.d/kubernetes.repo'
+      content: |
+        [kubernetes]
+        name=Kubernetes
+        baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+        enabled=1
+        gpgcheck=1
+        repo_gpgcheck=1
+        gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
   - ansible.builtin.dnf:
       name: 
         - docker-ce
+        - kubeadm
         - python3-pip
         - python3-setuptools
+        - httpd
+        - bind-utils
+        - iproute-tc
+        - iproute
       state: latest
 
   - ansible.builtin.pip:
-      name:
-        - docker
-        - pymysql
+        name:
+          - docker
+          - pymysql
 
   - ansible.builtin.service:
       name: docker
       state: started
       enabled: yes
 
-  - ansible.builtin.copy:
-      src: 'dockerback'
-      dest: '/root/'
-    
-  - community.docker.docker_container:
-      name: "{{ nome }}-{{ versao }}-prod"
-      state: absent
-    
-  - community.docker.docker_image:
-      state: absent
-      name: "{{ nome }}"
-      tag: "{{ versao }}"
-
-  - community.docker.docker_image:
-      name: "{{ nome }}:{{ versao }}"
-      build:
-        path: '/root/dockerback'
-      source: build
-      state: present
-
-  - community.docker.docker_container:
-      name: "{{ nome }}-{{ versao }}-prod"
-      image: "{{ nome }}:{{ versao }}"
+  - ansible.builtin.service:
+      name: kubelet
       state: started
-      detach: yes
-      tty: yes
-      restart_policy: always
-      ports:
-        - "0.0.0.0:8080:8080"
-        - "0.0.0.0:443:443"
-      env:
-        MYSQL_DB_HOST: "jdbc:mysql://{{ mysqlBackendHost }}:3306/{{ mysqlBackendDb }}"
-        MYSQL_DB_USER: "{{ mysqlBackendUsuario }}"
-        MYSQL_DB_PASS: "{{ mysqlBackendSenha }}"
-  
-  # ninguém viu isso :)
-  - ansible.builtin.pause:
-      seconds: 30
+      enabled: yes
 
-  - community.mysql.mysql_query:
-      login_db: "{{ mysqlBackendDb }}"
-      login_host: "{{ mysqlBackendHost }}"
-      login_password: "{{ mysqlBackendSenha }}"
-      login_user: "{{ mysqlBackendUsuario }}"
-      query:
-        - INSERT INTO usuario (password, username) VALUES ('letscodeiac', 'letscodeiac')
+  - ansible.builtin.copy:
+      src: '/var/tmp/kubeadm-init.log'
+      dest: '/var/tmp/kubeadm-init.log'
+      owner: root
+      group: root
+      mode: '0600'
+
+  - ansible.builtin.shell: |
+      swapoff -a
+      echo "$(dig +short apifrontend.adainterno) master-node" >> /etc/hosts
+      echo  "$(hostname -I | cut -d ' ' -f 1) node-1 worker-node-1" >> /etc/hosts
+      bash /var/tmp/kubeadm-init.log
+      
+  # - ansible.builtin.copy:
+  #     src: 'dockerback'
+  #     dest: '/root/'
+    
+  # - community.docker.docker_container:
+  #     name: "{{ nome }}-{{ versao }}-prod"
+  #     state: absent
+    
+  # - community.docker.docker_image:
+  #     state: absent
+  #     name: "{{ nome }}"
+  #     tag: "{{ versao }}"
+
+  # - community.docker.docker_image:
+  #     name: "{{ nome }}:{{ versao }}"
+  #     build:
+  #       path: '/root/dockerback'
+  #     source: build
+  #     state: present
+
+  # - community.docker.docker_container:
+  #     name: "{{ nome }}-{{ versao }}-prod"
+  #     image: "{{ nome }}:{{ versao }}"
+  #     state: started
+  #     detach: yes
+  #     tty: yes
+  #     restart_policy: always
+  #     ports:
+  #       - "0.0.0.0:8080:8080"
+  #       - "0.0.0.0:443:443"
+  #     env:
+  #       MYSQL_DB_HOST: "jdbc:mysql://{{ mysqlBackendHost }}:3306/{{ mysqlBackendDb }}"
+  #       MYSQL_DB_USER: "{{ mysqlBackendUsuario }}"
+  #       MYSQL_DB_PASS: "{{ mysqlBackendSenha }}"
+  
+  # # ninguém viu isso :)
+  # - ansible.builtin.pause:
+  #     seconds: 30
+
+  # - community.mysql.mysql_query:
+  #     login_db: "{{ mysqlBackendDb }}"
+  #     login_host: "{{ mysqlBackendHost }}"
+  #     login_password: "{{ mysqlBackendSenha }}"
+  #     login_user: "{{ mysqlBackendUsuario }}"
+  #     query:
+  #       - INSERT INTO usuario (password, username) VALUES ('letscodeiac', 'letscodeiac')
     

@@ -14,7 +14,7 @@
     mysqlBackendDb: 'letscodebyada'
   tasks:
 
-   - ansible.builtin.shell: 'setenforce 0'
+  - ansible.builtin.shell: 'setenforce 0'
   - ansible.builtin.shell: 'modprobe br_netfilter'
 
   - ansible.builtin.get_url:
@@ -38,7 +38,6 @@
         - kubeadm
         - python3-pip
         - python3-setuptools
-        - httpd
         - bind-utils
         - iproute-tc
         - iproute
@@ -47,7 +46,6 @@
   - ansible.builtin.pip:
         name:
           - docker
-          - pymysql
 
   - ansible.builtin.service:
       name: docker
@@ -60,8 +58,8 @@
       enabled: yes
 
   - ansible.builtin.copy:
-      src: '/var/tmp/kubeadm-init.log'
-      dest: '/var/tmp/kubeadm-init.log'
+      src: '/var/tmp/kubeadm-init'
+      dest: '/var/tmp/kubeadm-join'
       owner: root
       group: root
       mode: '0600'
@@ -70,7 +68,7 @@
       swapoff -a
       echo "$(dig +short apifrontend.adainterno) master-node" >> /etc/hosts
       echo  "$(hostname -I | cut -d ' ' -f 1) node-1 worker-node-1" >> /etc/hosts
-      bash /var/tmp/kubeadm-init.log
+      bash /var/tmp/kubeadm-join
       
   # - ansible.builtin.copy:
   #     src: 'dockerback'

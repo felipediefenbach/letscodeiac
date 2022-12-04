@@ -9,7 +9,7 @@ spec:
       app: hello
       tier: backend
       track: stable
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: hello
-          image: registry.adainterno:5000/letscodeiac/frontend:v1
+          image: registry.adainterno:5000/letscodeiac/frontend:v01
           ports:
             - name: node
               containerPort: 4200

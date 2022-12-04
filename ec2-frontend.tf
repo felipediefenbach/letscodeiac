@@ -33,3 +33,6 @@ resource "aws_instance" "frontend" {
 	depends_on = [aws_key_pair.parDeChaves]
 }
 
+output "ec2IdFrontend" {
+  value = aws_instance.frontend.id
+}

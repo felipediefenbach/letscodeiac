@@ -3,6 +3,7 @@
   gather_facts: false
   collections:
     community.general
+    amazon.aws
   vars:
     # - Projeto
     dominio: 'homolog.conexaoinfraestrutura.inf.br'
@@ -76,6 +77,23 @@
       delegate_to: acesso.{{ dominio }}
       become: true
       tags: [ never, git, criar ]
+
+    # reboot - selinux
+    - ansible.builtin.shell: |
+        terraform output ec2IdFrontend | tr -d '"'
+      register: pega_ec2id_frontend
+      tags: [ never, terraform, criar ]
+
+    - ansible.builtin.shell: |
+        terraform output ec2IdBackend | tr -d '"'
+      register: pega_ec2id_backend
+      tags: [ never, terraform, criar ]
+
+    - amazon.aws.ec2_instance:
+        state: restarted
+        instance_ids:
+          - "{{ pega_ec2id_backend.stdout }}"
+          - "{{ pega_ec2id_frontend.stdout }}"
 
     # login no registro
     - ansible.builtin.shell: |

@@ -31,3 +31,7 @@ resource "aws_instance" "backend" {
 
 	depends_on = [aws_key_pair.parDeChaves]
 }
+
+output "ec2IdBackend" {
+  value = aws_instance.backend.id
+}

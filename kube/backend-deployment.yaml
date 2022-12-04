@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: hello
-          image: registry.adainterno/letscodeiac/frontend:v01
+          image: 864342323788.dkr.ecr.us-east-1.amazonaws.com/backend:latest
           ports:
             - name: node
               containerPort: 4200

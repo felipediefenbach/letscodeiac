@@ -5,10 +5,11 @@
   collections:
     - community.docker
   vars:
+    registro: '864342323788.dkr.ecr.us-east-1.amazonaws.com'
     frontendNone: 'frontend'
-    frontendVersao: 'v01'
+    frontendVersao: 'latest'
     backendNone: 'backend'
-    backendVersao: 'v01'
+    backendVersao: 'latest'
   tasks:
 
   - ansible.builtin.shell: 'setenforce 0'
@@ -35,8 +36,6 @@
         - kubeadm
         - python3-pip
         - python3-setuptools
-        - httpd
-        - mod_ssl
         - bind-utils
         - iproute-tc
         - iproute
@@ -70,46 +69,21 @@
       kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
       kubeadm token create --print-join-command > /var/tmp/kubeadm-init
   
-  - community.docker.docker_container:
-      name: registry
-      image: registry:2.7
-      state: started
-      detach: yes
-      tty: yes
-      restart_policy: always
-      ports:
-        - "0.0.0.0:5000:5000"
+  - ansible.builtin.shell: |
+      cat /tmp/registry-login | docker login --username AWS --password-stdin {{ registro }}
+      
+  - community.docker.docker_image:
+      build:
+        path: 'dockerfront/'
+      name: "{{ registro }}/{{ frontendNone }}"
+      tag: "{{ frontendVersao }}"
+      push: true
+      source: build
 
-  # - community.docker.docker_image:
-  #     build:
-  #       path: 'dockerfront/'
-  #     name: "registry.adainterno/letscodeiac/{{ frontendNone }}"
-  #     tag: "{{ frontendVersao }}"
-  #     push: true
-  #     source: build
-
-  # - community.docker.docker_image:
-  #     build:
-  #       path: 'dockerback/'
-  #     name: "registry.adainterno/letscodeiac/{{ backendNone }}"
-  #     tag: "{{ backendVersao }}"
-  #     push: true
-  #     source: build
-
-  - ansible.builtin.shell: 'setsebool -P httpd_can_network_connect=1'
-
-  - ansible.builtin.copy:
-      dest: '/etc/httpd/conf.d/proxy.conf'
-      content: |
-        <VirtualHost *:443>
-          ErrorLog /var/log/httpd/app.err
-          CustomLog /var/log/httpd/app.log combined
-          ProxyPreserveHost On
-          ProxyPass / http://172.17.0.1:5000/
-          ProxyPassReverse / http://172.17.0.1:5000/
-        </VirtualHost>
-
-  - ansible.builtin.service:
-      name: httpd
-      state: started
-      enabled: yes
+  - community.docker.docker_image:
+      build:
+        path: 'dockerback/'
+      name: "{{ registro }}/{{ backendNone }}"
+      tag: "{{ backendVersao }}"
+      push: true
+      source: build

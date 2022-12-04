@@ -12,6 +12,12 @@
     git_proto: 'https'
     git_diretorio: '/srv/letscodeiac'
     git_branch: 'feature/kubernets'
+    # - Registro
+    registro: '864342323788.dkr.ecr.us-east-1.amazonaws.com'
+    frontendNone: 'frontend'
+    frontendVersao: 'latest'
+    backendNone: 'backend'
+    backendVersao: 'latest'
   tasks:
 
     - community.general.terraform:
@@ -24,7 +30,7 @@
         owner: root
         group: 'root'
         mode: '0600'
-      tags: [ never, git ]
+      tags: [ never, git, criar ]
 
     - ansible.builtin.file:
         dest: './ansible.cfg'
@@ -70,7 +76,21 @@
       delegate_to: acesso.{{ dominio }}
       become: true
       tags: [ never, git, criar ]
+
+    - ansible.builtin.shell: |
+        aws --profile conexinfra ecr get-login-password --region us-east-1 > /tmp/registry-login
+      tags: [ never, git, criar ]
       
+    - ansible.builtin.copy:
+        src: '/tmp/registry-login'
+        dest: "/tmp/registry-login"
+        owner: 'root'
+        group: 'root'
+        mode: '0600'
+      delegate_to: acesso.{{ dominio }}
+      become: true
+      tags: [ never, git, criar ]
+
     - ansible.builtin.shell: |
         ansible-playbook frontend.yml
         ansible-playbook -i apibackend, backend.yml

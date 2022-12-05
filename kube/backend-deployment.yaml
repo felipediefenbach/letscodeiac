@@ -21,7 +21,9 @@ spec:
       - name: regcred
       containers:
         - name: hello
-          image: 864342323788.dkr.ecr.us-east-1.amazonaws.com/frontend:latest
+          image: "864342323788.dkr.ecr.us-east-1.amazonaws.com/backend:latest"
           ports:
-            - name: node
-              containerPort: 4200
+            - name: java
+              containerPort: 8080
+
+

@@ -9,5 +9,5 @@ spec:
     tier: backend
   ports:
   - protocol: TCP
-    port: 4200
-    targetPort: http
+    port: 8080
+    targetPort: java

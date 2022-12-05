@@ -7,7 +7,7 @@ spec:
     app: hello
     tier: frontend
   ports:
-  - protocol: TCP
+  - protocol: "TCP"
     port: 4200
-    targetPort: node
+    targetPort: 4200
   type: LoadBalancer

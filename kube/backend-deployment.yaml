@@ -17,9 +17,11 @@ spec:
         tier: backend
         track: stable
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
         - name: hello
-          image: 864342323788.dkr.ecr.us-east-1.amazonaws.com/backend:latest
+          image: 864342323788.dkr.ecr.us-east-1.amazonaws.com/frontend:latest
           ports:
             - name: node
               containerPort: 4200

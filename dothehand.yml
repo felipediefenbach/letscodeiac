@@ -21,10 +21,6 @@
     backendVersao: 'latest'
   tasks:
 
-    - ansible.builtin.dnf:
-        name: epel-release
-      tags: [ never, criar ]
-
     - ansible.builtin.get_url:
         url: 'https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo'
         dest: '/etc/yum.repos.d/hashicorp.repo'
